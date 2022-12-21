@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  dp-cmap-nginx
+  namespace: cmap-nginx
+  labels:
+    app:  sinti2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sinti2
+  template:
+    metadata:
+      labels:
+        app:  sinti2
+    spec:
+      containers:
+      - name:  cnginx
+        image: nginx:latest     
+        ports:
+        - containerPort: 80
+        env:
+          - name: NGINX_PORT
+            valueFrom:
+              configMapKeyRef:
+                # El nombre del  ConfigMap donde almacenamos la clave y el valor
+                name: map-nginx
+                # La clave que contiene el valor.
+                key: NGINX_PORT
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                # El nombre del  ConfigMap donde almacenamos la clave y el valor
+                name: map-nginx
+                # La clave que contiene el valor.
+                key: DATABASE_HOST
+        volumeMounts:
+          - name: config
+            mountPath: /etc/nginx/conf.d
+            readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: map-nginx
+            items:
+            - key: "default.conf"
+              path: "default.conf"
