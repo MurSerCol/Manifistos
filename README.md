@@ -1,1 +1,1 @@
-# Manifistos
+# Manifest 
